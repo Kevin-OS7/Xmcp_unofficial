@@ -40,7 +40,7 @@ English: [README.md](README.md)
 Python 3.10 以上と [uv](https://docs.astral.sh/uv/) が必要です。
 
 ```bash
-uv tool install git+https://github.com/peaceplayer0722/Xmcp_unofficial
+uv tool install git+https://github.com/Kevin-OS7/Xmcp_unofficial
 ```
 
 クローンして使う場合は `uv sync && uv run xmcp-unofficial --help` です。
@@ -95,7 +95,7 @@ claude mcp add x-scraper -- xmcp-unofficial
 }
 ```
 
-インストールせずに使う場合は `"command": "uvx", "args": ["--from", "git+https://github.com/peaceplayer0722/Xmcp_unofficial", "xmcp-unofficial"]` とします。
+インストールせずに使う場合は `"command": "uvx", "args": ["--from", "git+https://github.com/Kevin-OS7/Xmcp_unofficial", "xmcp-unofficial"]` とします。
 
 ## 設定
 

@@ -41,7 +41,7 @@ All tools are read-only.
 Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-uv tool install git+https://github.com/peaceplayer0722/Xmcp_unofficial
+uv tool install git+https://github.com/Kevin-OS7/Xmcp_unofficial
 ```
 
 or from a clone: `uv sync && uv run xmcp-unofficial --help`.
@@ -100,7 +100,7 @@ claude mcp add x-scraper -- xmcp-unofficial
 }
 ```
 
-Without installing: `"command": "uvx", "args": ["--from", "git+https://github.com/peaceplayer0722/Xmcp_unofficial", "xmcp-unofficial"]`.
+Without installing: `"command": "uvx", "args": ["--from", "git+https://github.com/Kevin-OS7/Xmcp_unofficial", "xmcp-unofficial"]`.
 
 ## Configuration
 
