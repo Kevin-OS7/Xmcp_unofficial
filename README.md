@@ -13,6 +13,30 @@ profiles, timelines, replies, followers, trends — without the paid official AP
 > X changes its internal API without notice; things will break from time to time.
 > This project is not affiliated with X Corp.
 
+## What you need
+
+> [!IMPORTANT]
+> This project does **not** encourage large-scale scraping. Throwaway accounts and
+> proxies are recommended so that the small amount of reading you do through an AI
+> agent can never put **your own X account** at risk — not to scrape more.
+
+**1. Throwaway X accounts** (one or more)
+Never use your main account; scraping accounts can be locked or suspended at any time.
+Ready-made accounts can be bought at
+[AccsMarket](https://www.accsmarket.com/en/?ref=818187).
+
+**2. A proxy per account** (recommended)
+Running throwaway accounts from your home IP ties them to you. A static residential
+proxy gives each account its own stable, ordinary-looking IP. We recommend
+[Proxy-Cheap](https://app.proxy-cheap.com/r/wCfesT) — a **Static Residential (ISP)
+IPv4** proxy costs around **$3.59/month** (as of October 2026; check the site for current
+pricing).
+
+**3. Python 3.10+ and [uv](https://docs.astral.sh/uv/)**
+
+<sub>The AccsMarket and Proxy-Cheap links above are affiliate links; using them supports
+this project at no extra cost to you.</sub>
+
 ## Tools
 
 All tools are read-only.
