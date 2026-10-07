@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xmcp-unofficial"
+version = "0.1.0"
+description = "Unofficial MCP server for scraping X (Twitter) via its internal GraphQL API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE", "src/xmcp_unofficial/_vendor/twscrape/LICENSE"]
+keywords = ["mcp", "x", "twitter", "scraping", "model-context-protocol"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+  "mcp>=2.0,<3",
+  "aiosqlite>=0.17.0",
+  "beautifulsoup4>=4.13.0",
+  "fake-useragent>=1.4.0",
+  "httpx>=0.26.0",
+  "loguru>=0.7.0",
+  "pyotp>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.6"]
+
+[project.scripts]
+xmcp-unofficial = "xmcp_unofficial.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/xmcp_unofficial"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 99
+extend-exclude = ["src/xmcp_unofficial/_vendor"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
