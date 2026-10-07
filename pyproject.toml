@@ -24,6 +24,7 @@ dependencies = [
   "httpx>=0.26.0",
   "loguru>=0.7.0",
   "pyotp>=2.9.0",
+  "tomli>=2.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]

@@ -132,6 +132,7 @@ class API:
         self, op: str, kv: dict, ft: dict | None = None, limit=-1, cursor_type="Bottom"
     ):
         queue, cur, cnt, active = op.split("/")[-1], None, 0, True
+        empty_probe = 0
         kv, ft = {**kv}, {**GQL_FEATURES, **(ft or {})}
 
         async with QueueClient(self.pool, queue, self.debug, proxy=self.proxy) as client:
@@ -167,7 +168,14 @@ class API:
 
                 rep, cnt, active = self._is_end(rep, queue, els, cur, cnt, limit)
                 if rep is None:
+                    # Empty page. X normally ends follower-style listings with a page that only
+                    # carries a cursor, but a transient empty page can also appear mid-list.
+                    # Probe the cursor once more before declaring the end.
+                    if cur is not None and empty_probe < 1:
+                        empty_probe += 1
+                        continue
                     return
+                empty_probe = 0
 
                 yield rep
 

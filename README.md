@@ -46,31 +46,39 @@ uv tool install git+https://github.com/peaceplayer0722/Xmcp_unofficial
 
 or from a clone: `uv sync && uv run xmcp-unofficial --help`.
 
-## Add a scraping account
+## Setup
 
-The server needs at least one logged-in X account. Cookie login is the reliable way:
-
-1. Log in to x.com in a browser with a **dedicated** account.
-2. Open DevTools → Application → Cookies → `https://x.com`, copy `auth_token` and `ct0`.
-3. Register it:
+Run the interactive setup once. It registers throwaway accounts (cookies are entered
+hidden), checks each proxy can reach x.com, sets the request delay, and verifies the
+result with a real request:
 
 ```bash
-xmcp-unofficial accounts add my_reader --cookies "auth_token=xxxx; ct0=yyyy"
-# optional per-account proxy
-xmcp-unofficial accounts add my_reader2 --cookies-file cookies.txt --proxy http://user:pass@host:port
-
-xmcp-unofficial accounts list      # status of all accounts
-xmcp-unofficial accounts check     # fetch a profile to confirm it works
+xmcp-unofficial setup
 ```
 
-`--cookies` also accepts a JSON cookie export (e.g. from a browser extension).
-Multiple accounts are rotated automatically; a rate-limited account is skipped until
-its limit resets.
+To get cookies: log in to x.com with a **dedicated** account, open DevTools →
+Application → Cookies → `https://x.com`, and copy `auth_token` and `ct0`
+(`auth_token=...; ct0=...`, or a JSON cookie export).
 
-Accounts live in a SQLite file, `~/.xmcp_unofficial/accounts.db` by default
-(`XMCP_DB` to change). The file is the same format as
-[twscrape](https://github.com/vladkens/twscrape)'s `accounts.db`, so you can point
-`XMCP_DB` at an existing twscrape database.
+Already have accounts in a [twscrape](https://github.com/vladkens/twscrape) database?
+Import them:
+
+```bash
+xmcp-unofficial accounts import /path/to/twscrape/accounts.db
+```
+
+Non-interactive account commands:
+
+```bash
+xmcp-unofficial accounts add my_reader --cookies "auth_token=xxxx; ct0=yyyy" --proxy http://user:pass@host:port
+xmcp-unofficial accounts set-proxy my_reader http://user:pass@host:port   # or "none"
+xmcp-unofficial accounts list      # status of all accounts
+xmcp-unofficial accounts check     # fetch a profile to confirm it works
+xmcp-unofficial accounts remove my_reader
+```
+
+Multiple accounts are rotated automatically; a rate-limited account is skipped until
+its limit resets. Accounts are stored in `~/.xmcp_unofficial/accounts.db`.
 
 ## Connect to an MCP client
 
@@ -86,8 +94,7 @@ claude mcp add x-scraper -- xmcp-unofficial
 {
   "mcpServers": {
     "x-scraper": {
-      "command": "xmcp-unofficial",
-      "env": { "XMCP_REQ_DELAY": "1-3" }
+      "command": "xmcp-unofficial"
     }
   }
 }
@@ -97,14 +104,27 @@ Without installing: `"command": "uvx", "args": ["--from", "git+https://github.co
 
 ## Configuration
 
-| Env var | Default | Meaning |
-| --- | --- | --- |
-| `XMCP_DB` | `~/.xmcp_unofficial/accounts.db` | Account database |
-| `XMCP_PROXY` | – | Proxy for all requests (overrides per-account proxies) |
-| `XMCP_REQ_DELAY` | – | Delay between paginated requests: `2` (fixed) or `1-3` (random range, seconds) |
-| `XMCP_TIMEOUT` | `120` | Max seconds per tool call; partial results are returned on timeout |
-| `XMCP_MAX_LIMIT` | `200` | Upper bound for any `limit` argument |
-| `TWS_LOG_LEVEL` | `INFO` | Log level (logs go to stderr) |
+Settings are read from `~/.xmcp_unofficial/config.toml` (written by `setup`), so every
+MCP client shares them. An `XMCP_*` environment variable, e.g. in a client's `env`
+block, overrides the file.
+
+```toml
+req_delay = "1.5"      # seconds between paginated requests: 1.5 fixed, "1-3" random, 0 none
+timeout = 120
+max_limit = 200
+# proxy = "http://user:pass@host:port"   # applies to every account
+# db = "~/.xmcp_unofficial/accounts.db"
+```
+
+| config.toml | Env var | Default | Meaning |
+| --- | --- | --- | --- |
+| `db` | `XMCP_DB` | `~/.xmcp_unofficial/accounts.db` | Account database |
+| `proxy` | `XMCP_PROXY` | – | Proxy for all requests (overrides per-account proxies) |
+| `req_delay` | `XMCP_REQ_DELAY` | `1.5` | Delay between paginated requests |
+| `timeout` | `XMCP_TIMEOUT` | `120` | Max seconds per tool call; partial results are returned on timeout |
+| `max_limit` | `XMCP_MAX_LIMIT` | `200` | Upper bound for any `limit` argument |
+| – | `XMCP_CONFIG` | `~/.xmcp_unofficial/config.toml` | Config file location |
+| – | `TWS_LOG_LEVEL` | `INFO` | Log level (logs go to stderr) |
 
 ## Troubleshooting
 

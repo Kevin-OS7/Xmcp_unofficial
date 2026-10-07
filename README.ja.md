@@ -45,29 +45,35 @@ uv tool install git+https://github.com/peaceplayer0722/Xmcp_unofficial
 
 クローンして使う場合は `uv sync && uv run xmcp-unofficial --help` です。
 
-## スクレイピング用アカウントの登録
+## セットアップ
 
-ログイン済みの X アカウントが最低 1 つ必要です。
-Cookie で登録するのが確実です。
-
-1. **専用の**アカウントでブラウザから x.com にログインする。
-2. DevTools → Application → Cookies → `https://x.com` から `auth_token` と `ct0` をコピーする。
-3. 登録する。
+最初に一度、対話形式のセットアップを実行します。
+捨てアカウントの登録（Cookie は画面に表示されない形で入力）、プロキシが x.com に届くかの確認、リクエスト間隔の設定、実際に 1 件取得しての動作確認までを順に行います。
 
 ```bash
-xmcp-unofficial accounts add my_reader --cookies "auth_token=xxxx; ct0=yyyy"
-# アカウントごとのプロキシも指定できる
-xmcp-unofficial accounts add my_reader2 --cookies-file cookies.txt --proxy http://user:pass@host:port
-
-xmcp-unofficial accounts list      # 全アカウントの状態
-xmcp-unofficial accounts check     # プロフィールを 1 件取得して動作確認
+xmcp-unofficial setup
 ```
 
-`--cookies` にはブラウザ拡張などで書き出した JSON 形式の Cookie も渡せます。
-複数アカウントは自動でローテーションされ、レート制限中のアカウントは解除まで使われません。
+Cookie の取り方：**専用の**アカウントでブラウザから x.com にログインし、DevTools → Application → Cookies → `https://x.com` から `auth_token` と `ct0` をコピーします（`auth_token=...; ct0=...` の形か、JSON で書き出したもの）。
 
-アカウントは SQLite ファイル（既定は `~/.xmcp_unofficial/accounts.db`、`XMCP_DB` で変更可）に保存されます。
-形式は [twscrape](https://github.com/vladkens/twscrape) の `accounts.db` と同じなので、既存の twscrape の DB を `XMCP_DB` で指定してそのまま使えます。
+[twscrape](https://github.com/vladkens/twscrape) の DB にすでにアカウントがあるなら、取り込めます。
+
+```bash
+xmcp-unofficial accounts import /path/to/twscrape/accounts.db
+```
+
+対話なしで使うアカウント操作コマンドは次のとおりです。
+
+```bash
+xmcp-unofficial accounts add my_reader --cookies "auth_token=xxxx; ct0=yyyy" --proxy http://user:pass@host:port
+xmcp-unofficial accounts set-proxy my_reader http://user:pass@host:port   # "none" で解除
+xmcp-unofficial accounts list      # 全アカウントの状態
+xmcp-unofficial accounts check     # プロフィールを 1 件取得して動作確認
+xmcp-unofficial accounts remove my_reader
+```
+
+複数アカウントは自動でローテーションされ、レート制限中のアカウントは解除まで使われません。
+アカウントは `~/.xmcp_unofficial/accounts.db` に保存されます。
 
 ## MCP クライアントへの接続
 
@@ -83,8 +89,7 @@ claude mcp add x-scraper -- xmcp-unofficial
 {
   "mcpServers": {
     "x-scraper": {
-      "command": "xmcp-unofficial",
-      "env": { "XMCP_REQ_DELAY": "1-3" }
+      "command": "xmcp-unofficial"
     }
   }
 }
@@ -94,14 +99,26 @@ claude mcp add x-scraper -- xmcp-unofficial
 
 ## 設定
 
-| 環境変数 | 既定値 | 意味 |
-| --- | --- | --- |
-| `XMCP_DB` | `~/.xmcp_unofficial/accounts.db` | アカウント DB |
-| `XMCP_PROXY` | なし | 全リクエスト共通のプロキシ（アカウント個別の設定より優先） |
-| `XMCP_REQ_DELAY` | なし | ページング間の待ち秒数。`2`（固定）または `1-3`（範囲内でランダム） |
-| `XMCP_TIMEOUT` | `120` | 1 回のツール呼び出しの上限秒数。超えたら取得済みの分だけ返す |
-| `XMCP_MAX_LIMIT` | `200` | `limit` 引数の上限 |
-| `TWS_LOG_LEVEL` | `INFO` | ログレベル（ログは stderr に出る） |
+設定は `~/.xmcp_unofficial/config.toml`（`setup` が書き出す）から読むので、複数の MCP クライアントで共有されます。
+クライアントの `env` などで `XMCP_*` 環境変数を指定すると、そちらが優先されます。
+
+```toml
+req_delay = "1.5"      # ページング間の待ち秒数。1.5 は固定、"1-3" は範囲内でランダム、0 は待ちなし
+timeout = 120
+max_limit = 200
+# proxy = "http://user:pass@host:port"   # 全アカウント共通のプロキシ
+# db = "~/.xmcp_unofficial/accounts.db"
+```
+
+| config.toml | 環境変数 | 既定値 | 意味 |
+| --- | --- | --- | --- |
+| `db` | `XMCP_DB` | `~/.xmcp_unofficial/accounts.db` | アカウント DB |
+| `proxy` | `XMCP_PROXY` | なし | 全リクエスト共通のプロキシ（アカウント個別の設定より優先） |
+| `req_delay` | `XMCP_REQ_DELAY` | `1.5` | ページング間の待ち秒数 |
+| `timeout` | `XMCP_TIMEOUT` | `120` | 1 回のツール呼び出しの上限秒数。超えたら取得済みの分だけ返す |
+| `max_limit` | `XMCP_MAX_LIMIT` | `200` | `limit` 引数の上限 |
+| なし | `XMCP_CONFIG` | `~/.xmcp_unofficial/config.toml` | 設定ファイルの場所 |
+| なし | `TWS_LOG_LEVEL` | `INFO` | ログレベル（ログは stderr に出る） |
 
 ## トラブルシューティング
 

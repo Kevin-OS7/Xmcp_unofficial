@@ -9,7 +9,7 @@ twscrape
 
 `src/xmcp_unofficial/_vendor/twscrape/` is derived from twscrape
 (https://github.com/vladkens/twscrape, v0.17.0 plus local fixes from
-https://github.com/peaceplayer0722/twscrape), used under the MIT License.
+https://github.com/peaceplayer0722/twscrape, branch fix/xclid-2026-10 @ 5e2b451), used under the MIT License.
 Modifications: CLI module removed; request delay option added to API;
 queue_client no longer calls exit(1) on GraphQL feature errors.
 

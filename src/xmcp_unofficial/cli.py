@@ -44,6 +44,25 @@ async def _accounts(args: argparse.Namespace) -> int:
         )
         return 0
 
+    if args.action == "import":
+        from ._vendor.twscrape import AccountsPool
+
+        src = Path(args.source).expanduser()
+        if not src.exists():
+            print(f"error: {src} not found", file=sys.stderr)
+            return 1
+        have = {a.username for a in await pool.get_all()}
+        incoming = await AccountsPool(str(src)).get_all()
+        new = [a for a in incoming if a.username not in have]
+        for account in new:
+            # rate-limit locks belong to the other tool's run; start clean
+            account.locks = {}
+            await pool.save(account)
+        print(
+            f"imported {len(new)} account(s), skipped {len(incoming) - len(new)} already present"
+        )
+        return 0
+
     if args.action == "list":
         print(json.dumps(await scraper.account_status(), indent=2, ensure_ascii=False))
         return 0
@@ -80,6 +99,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     sub = p.add_subparsers(dest="command")
     sub.add_parser("serve", help="run the MCP server over stdio (default)")
+    sub.add_parser("setup", help="interactive setup: accounts, proxies, request delay")
 
     acc = sub.add_parser("accounts", help="manage scraping accounts")
     asub = acc.add_subparsers(dest="action", required=True)
@@ -96,6 +116,8 @@ def main(argv: list[str] | None = None) -> None:
     add.add_argument("--password", help=argparse.SUPPRESS)
     add.add_argument("--email", help=argparse.SUPPRESS)
 
+    imp = asub.add_parser("import", help="copy accounts from another twscrape accounts.db")
+    imp.add_argument("source", help="path to a twscrape accounts.db")
     asub.add_parser("list", help="show accounts and rate-limit status")
     rm = asub.add_parser("remove", help="remove accounts")
     rm.add_argument("usernames", nargs="+")
@@ -108,11 +130,16 @@ def main(argv: list[str] | None = None) -> None:
 
     args = p.parse_args(argv)
 
-    if args.command == "accounts":
+    if args.command in ("accounts", "setup"):
         from .scraper import ScrapeError
+        from .setup_wizard import run_setup
 
         try:
-            sys.exit(asyncio.run(_accounts(args)))
+            coro = _accounts(args) if args.command == "accounts" else run_setup()
+            sys.exit(asyncio.run(coro))
+        except (KeyboardInterrupt, EOFError):
+            print("\naborted", file=sys.stderr)
+            sys.exit(130)
         except (ScrapeError, ValueError, OSError) as e:
             print(f"error: {e}", file=sys.stderr)
             sys.exit(1)
