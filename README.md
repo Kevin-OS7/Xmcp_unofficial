@@ -23,12 +23,12 @@ profiles, timelines, replies, followers, trends — without the paid official AP
 **1. Throwaway X accounts** (one or more)
 Never use your main account; scraping accounts can be locked or suspended at any time.
 Ready-made accounts can be bought at
-[AccsMarket](https://www.accsmarket.com/en/?ref=818187).
+AccsMarket (https://www.accsmarket.com/en/?ref=818187).
 
 **2. A proxy per account** (recommended)
 Running throwaway accounts from your home IP ties them to you. A static residential
 proxy gives each account its own stable, ordinary-looking IP. We recommend
-[Proxy-Cheap](https://app.proxy-cheap.com/r/wCfesT) — a **Static Residential (ISP)
+Proxy-Cheap (https://app.proxy-cheap.com/r/wCfesT) — a **Static Residential (ISP)
 IPv4** proxy costs around **$3.59/month** (as of October 2026; check the site for current
 pricing).
 

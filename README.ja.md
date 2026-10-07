@@ -21,12 +21,12 @@ English: [README.md](README.md)
 
 **1. 捨ての X アカウント（1 つ以上）**
 メインアカウントは絶対に使わないでください。スクレイピングに使ったアカウントはいつロックや凍結されてもおかしくありません。
-捨てアカウントは [AccsMarket](https://www.accsmarket.com/en/?ref=818187) での購入をお勧めします。
+捨てアカウントは AccsMarket (https://www.accsmarket.com/en/?ref=818187) での購入をお勧めします。
 
 **2. アカウントごとのプロキシ（推奨）**
 捨てアカウントを自宅の IP から使うと、そのアカウントと自分が結び付いてしまいます。
 固定の住宅用プロキシを使えば、アカウントごとに安定した普通の IP を割り当てられます。
-プロキシは [Proxy-Cheap](https://app.proxy-cheap.com/r/wCfesT) をお勧めします。
+プロキシは Proxy-Cheap (https://app.proxy-cheap.com/r/wCfesT) をお勧めします。
 **Static Residential (ISP) IPv4** が月 **3.59 ドル程度**で使えます（2026 年 10 月時点。最新の価格はサイトで確認してください）。
 
 **3. Python 3.10 以上と [uv](https://docs.astral.sh/uv/)**
